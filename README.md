@@ -1,2 +1,2 @@
 # RSSS
-Really Simple Serial Syncronization
+The Really Simple Serial Syncronization library for Arduino.
