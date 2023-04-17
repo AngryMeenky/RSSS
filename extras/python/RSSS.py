@@ -61,13 +61,14 @@ class RSSS:
   def __findSync(self):
     while True:
       byte = self.__serial.read()
+
       if len(byte) == 0:
         return 0 # ran out of bytes before a synchronization point was found
 
       self.__last = self.__last[1:]
       self.__last.append(byte[0])
 
-      if self.__last[0] == 0xAA and crc8.validate(last, 0x78):
+      if self.__last[0] == 0xAA and crc8.validate(self.__last, 0x78):
         return self.__last[1] | (self.__last[2] << 8)
 
 

@@ -43,6 +43,7 @@ def calculate(data, crc):
 
 def append(data, crc):
   data.append(calculate(data, crc))
+  return data;
 
 
 def validate(data, crc):
