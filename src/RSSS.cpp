@@ -139,7 +139,7 @@ int16_t RSSS::_findSync() {
 
 void RSSS::_emitSync(int16_t len) {
   uint8_t packet[4] = { 0xAA, (uint8_t) (len & 0xFF), (uint8_t) ((len >> 8) & 0xFF), 0 };
-  rsss::appendCrc8(&packet[0], 4, 0x78);
+  rsss::appendCrc8(&packet[0], 3, 0x78);
   _serial->write(&packet[0], sizeof(packet));
 }
 
