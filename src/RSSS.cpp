@@ -63,8 +63,8 @@ int RSSS::availableForWrite(void) {
 
 
 int RSSS::write(uint8_t *data, int length) {
-  int avail = availableForWrite();
-  int count = length <= avail ? length : avail;
+  //int avail = availableForWrite();
+  int count = length;// <= avail ? length : avail;
   int retVal = 0;
 
   if(count == 0) {
