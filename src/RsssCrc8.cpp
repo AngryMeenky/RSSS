@@ -47,7 +47,7 @@ uint8_t rsss::calcCrc8(const uint8_t *data, int len, uint8_t crc) {
 
 
 uint8_t rsss::appendCrc8(uint8_t *data, int len, uint8_t crc) {
-  data[len] = calcCrc8(data, len, crc);
+  return data[len] = calcCrc8(data, len, crc);
 }
 
 
