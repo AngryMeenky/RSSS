@@ -1,6 +1,7 @@
 # RSSS
+
 The Really Simple Serial Syncronization library for Arduino.
-============================================================
+------------------------------------------------------------
 
 This library provides a wrapper around an
 [Arduino](https://www.arduino.cc/)
