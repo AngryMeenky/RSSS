@@ -1,4 +1,4 @@
-#include "RsssCrc8.h"
+#include "mavcom/RsssCrc8.h"
 
 #include <array>
 
@@ -49,11 +49,11 @@ uint8_t rsss::calcCrc8(const uint8_t *data, int len, uint8_t crc) {
 
 
 uint8_t rsss::appendCrc8(uint8_t *data, int len, uint8_t crc) {
-  data[len] = calcCrc8(data, len, crc);
+  return data[len] = calcCrc8(data, len, crc);
 }
 
 
-uint8_t rsss::validateCrc8(const uint8_t *data, int len, uint8_t crc) {
+bool rsss::validateCrc8(const uint8_t *data, int len, uint8_t crc) {
   return !calcCrc8(data, len, crc);
 }
 
