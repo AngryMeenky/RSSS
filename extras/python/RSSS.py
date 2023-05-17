@@ -78,7 +78,7 @@ class RSSS:
         count -= wrote
         data = data[wrote:]
 
-        if slef.writeSync != 0:
+        if self.writeSync != 0:
           return wrote
         elif self.__addTail:
           self.__serial.write([ self.__writeCrc & 0xFF, (self.__writeCrc >> 8) & 0xFF ])
