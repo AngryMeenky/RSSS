@@ -22,6 +22,10 @@ RSSS::RSSS(Stream &s, bool tail):
 
 
 int RSSS::available(void) {
+  if(_remain > 0) {
+    return 1; // allow the held byte to count while looking for tail bytes
+  }
+
   if(_readSync <= 0) {
     // attempt to find a synchronization point
     _readSync = _findSync();
@@ -30,7 +34,7 @@ int RSSS::available(void) {
   // was a synchronization point was found?
   if(_readSync > 0) {
     int avail = _serial->available();
-    return _readSync <= avail ? _readSync : avail;
+    return _readSync <= avail > _readSync ? _readSync : avail;
   }
 
   // no synchronization point found
@@ -42,12 +46,14 @@ int RSSS::read(uint8_t *buffer, int max) {
   // handle optional CRC processing
   if(_addTail && _remain != 0) {
     if(_serial->available() >= _remain) {
-      uint8_t buffer[2];
-      int count = _serial->readBytes(&buffer[2 - _remain], _remain);
+      uint8_t buf[2];
+      int count = _serial->readBytes(&buf[2 - _remain], _remain);
 
       if(count > 0) {
+        _readCrc = rsss::calcCrc16(&buf[0], count, _readCrc);
+
         if(!(_remain -= count)) {
-          _valid = !rsss::calcCrc16(&buffer[0], 2, _readCrc);
+          _valid = !_readCrc;
           buffer[0] = _hold;
           _hold = 0;
           return 1;
