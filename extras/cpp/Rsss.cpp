@@ -172,6 +172,7 @@ bool RSSS::emitSync(std::uint16_t length) {
 
   if(::write(serial, &packet[0], 4) == 4) {
     writeCrc = CRC16_SEED;
+    return true;
   }
 
   return false;
