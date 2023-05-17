@@ -1,6 +1,6 @@
-#include "mavcom/RSSS.h"
-#include "mavcom/RsssCrc8.h"
-#include "mavcom/RsssCrc16.h"
+#include "RSSS.h"
+#include "RsssCrc8.h"
+#include "RsssCrc16.h"
 
 #include <errno.h>
 #include <cstring>

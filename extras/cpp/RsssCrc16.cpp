@@ -1,4 +1,4 @@
-#include "mavcom/RsssCrc16.h"
+#include "RsssCrc16.h"
 
 #include <array>
 
