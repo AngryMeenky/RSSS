@@ -34,7 +34,7 @@ int RSSS::available(void) {
   // was a synchronization point was found?
   if(_readSync > 0) {
     int avail = _serial->available();
-    return _readSync <= avail > _readSync ? _readSync : avail;
+    return _readSync <= avail ? _readSync : avail;
   }
 
   // no synchronization point found
@@ -101,7 +101,7 @@ int RSSS::availableForWrite(void) {
   int avail = _serial->availableForWrite();
 
   if(avail >= _writeSync) {
-    if(avail - _writeSync >= sizeof(_last)) {
+    if((size_t) (avail - _writeSync) >= sizeof(_last)) {
       avail -= sizeof(_last);
     }
     else {
