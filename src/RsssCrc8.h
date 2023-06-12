@@ -1,6 +1,9 @@
 #ifndef RSSS_CRC8
 #  define RSSS_CRC8
 
+#  include <cstdint>
+
+
 namespace rsss {
 
   uint8_t calcCrc8(const uint8_t *, int, uint8_t);
