@@ -2,6 +2,9 @@
 #include "RsssCrc8.h"
 #include "RsssCrc16.h"
 
+#ifdef __linux__
+#  include <cstring>
+#endif
 
 #define CRC8_SEED    0x78
 #define CRC16_SEED 0x8795
