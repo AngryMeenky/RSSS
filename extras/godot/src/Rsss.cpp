@@ -2,7 +2,7 @@
 #include "RsssCrc8.h"
 #include "RsssCrc16.h"
 
-#include <errno.h>
+#include <chrono>
 #include <cstring>
 #include <unistd.h>
 
@@ -222,5 +222,18 @@ bool RSSS::emitSync(std::uint16_t length) {
   }
 
   return false;
+}
+
+bool RSSS::waitForSync(int64_t ms) {
+  if(readSync > 0) {
+    return true;
+  }
+
+  auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
+  do {
+    readSync = findSync();
+  } while(readSync == 0 && std::chrono::steady_clock::now() < end);
+
+  return readSync != 0;
 }
 
