@@ -1,6 +1,6 @@
 [configuration]
 
-entry_symbol = "stream_peer_serial_library_init"
+entry_symbol = "rsss_library_init"
 compatibility_minimum = 4.1
 
 [libraries]

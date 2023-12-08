@@ -127,7 +127,7 @@ void PacketPeerRsss::writePackets() {
 }
 
 
-void _bind_methods() {
+void PacketPeerRsss::_bind_methods() {
   ClassDB::bind_static_method("PacketPeerRsss", D_METHOD("wrap", "stream"), &PacketPeerRsss::wrap);
 }
 
