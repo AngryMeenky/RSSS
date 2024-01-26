@@ -15,8 +15,32 @@ env = SConscript("godot-cpp/SConstruct")
 env.Append(CPPDEFINES=["GDEXTENSION"])
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
+env.Append(CPPPATH=[
+  "../../../../../../StreamPeerSerial/",
+  "../../../../../../StreamPeerSerial/serial/include"
+])
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")
+sources.append("../../../../../../StreamPeerSerial/stream_peer_serial.cpp")
+
+# serial library
+serial_dir = "../../../../../../StreamPeerSerial/serial/"
+sources.append(serial_dir + "src/serial.cc")
+
+if env["platform"] == "windows":
+    sources.append(serial_dir + "src/impl/win.cc")
+    sources.append(serial_dir + "src/impl/list_ports/list_ports_win.cc")
+    if env.get("is_msvc", True):
+        env.Append(LINKFLAGS=["setupapi.lib", "Advapi32.lib"])
+    else:
+        env.Append(LIBS=["setupapi", "Advapi32"])
+elif env["platform"].startswith("linux"):
+    sources.append(serial_dir + "src/impl/unix.cc")
+    sources.append(serial_dir + "src/impl/list_ports/list_ports_linux.cc")
+    env.Append(LIBS=["rt", "pthread"])
+elif env["platform"] == "macos":
+    sources.append(serial_dir + "src/impl/unix.cc")
+    sources.append(serial_dir + "src/impl/list_ports/list_ports_osx.cc")
 
 if env["platform"] == "macos":
     library = env.SharedLibrary(

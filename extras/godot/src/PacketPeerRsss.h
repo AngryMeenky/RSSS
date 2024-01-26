@@ -48,8 +48,8 @@
 using namespace godot;
 
 
-class PacketPeerRsss : public PacketPeerExtension {
-  GDCLASS(PacketPeerRsss, PacketPeerExtension);
+class PacketPeerRsss : public RefCounted {
+  GDCLASS(PacketPeerRsss, RefCounted);
 
   struct Packet {
     Packet(): Packet(nullptr, 0) {}
@@ -79,18 +79,26 @@ class PacketPeerRsss : public PacketPeerExtension {
   std::thread                worker_in;
   std::thread                worker_out;
   std::atomic_bool           go;
+  int32_t                    encode_override;
+  Error                      pkt_err;
 
 public:
-  PacketPeerRsss(StreamPeer * = nullptr);
+  PacketPeerRsss(StreamPeerSerial * = nullptr);
   ~PacketPeerRsss();
 
-  static PacketPeerRsss *wrap(StreamPeer *stream) { return new PacketPeerRsss(stream); }
+  static PacketPeerRsss *wrap(StreamPeerSerial *stream) { return new PacketPeerRsss(stream); }
 
-  int32_t _get_max_packet_size() const override;
-  int32_t _get_available_packet_count() const override;
+  Variant get_var(bool allow_objects = false);
+  Error put_var(const Variant &var, bool full_objects = false);
+  PackedByteArray get_packet();
+  Error put_packet(const PackedByteArray &buffer);
+  Error get_packet_error() const;
+  int32_t get_available_packet_count() const;
+  int32_t get_encode_buffer_max_size() const;
+  void set_encode_buffer_max_size(int32_t max_size);
 
-  Error _get_packet(const uint8_t **r_buffer, int32_t* r_buffer_size) override;
-  Error _put_packet(const uint8_t *p_buffer, int p_buffer_size) override;
+  void set_stream_peer(StreamPeerSerial *);
+  StreamPeerSerial *get_stream_peer();
 
 protected:
   void readPackets();

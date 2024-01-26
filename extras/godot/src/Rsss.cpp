@@ -14,7 +14,7 @@ using namespace rsss;
 using namespace godot;
 
 
-RSSS::RSSS(StreamPeer *s, bool t):
+RSSS::RSSS(StreamPeerSerial *s, bool t):
   serial(s),
   last{ 0, 0, 0, 0 },
   readCrc(0),
@@ -87,7 +87,7 @@ int64_t RSSS::read(PackedByteArray &data, int64_t offset, int64_t length) {
 
 int64_t RSSS::write(const PackedByteArray &data, int64_t offset, int64_t length) {
   int64_t retVal = 0;
-  auto count = length;
+  auto count = length & 0xFFFF;
 
   if(serial.is_null()) {
     goto failure;
@@ -180,7 +180,7 @@ failure:
 }
 
 
-static bool nextByte(StreamPeer *s, uint8_t *d) {
+static bool nextByte(StreamPeerSerial *s, uint8_t *d) {
   if(s->get_available_bytes() > 0) {
     *d = s->get_u8();
     return true;
@@ -212,7 +212,7 @@ bool RSSS::emitSync(std::uint16_t length) {
   header.resize(4);
   header[0] = 0xAA;
   header[1] = length & 0xFF;
-  header[2] = length > 8;
+  header[2] = length >> 8;
   header[3] = 0;
   appendCrc8(&header[0], 3, 0x78);
 
@@ -231,7 +231,9 @@ bool RSSS::waitForSync(int64_t ms) {
 
   auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
   do {
-    readSync = findSync();
+    if((readSync = findSync()) == 0) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
   } while(readSync == 0 && std::chrono::steady_clock::now() < end);
 
   return readSync != 0;

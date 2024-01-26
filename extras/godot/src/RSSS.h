@@ -8,12 +8,14 @@
 #include "godot_cpp/classes/stream_peer.hpp"
 #include "godot_cpp/variant/packed_byte_array.hpp"
 
+#include "stream_peer_serial.h"
+
 
 namespace rsss {
 
 class RSSS {
   public:
-    RSSS(godot::StreamPeer *s, bool t = false);
+    RSSS(StreamPeerSerial *s, bool t = false);
     RSSS(): RSSS(nullptr) {}
 
     int64_t read(       godot::PackedByteArray &, int64_t, int64_t);
@@ -28,17 +30,19 @@ class RSSS {
 
     explicit operator bool() const { return serial.is_valid(); }
 
+    StreamPeerSerial *getStream() { return serial.ptr(); }
+
   private:
-    godot::Ref<godot::StreamPeer> serial;
-    std::array<std::uint8_t, 4>   last;
-    std::uint16_t                 readCrc;
-    std::uint16_t                 readSync;
-    std::uint16_t                 writeCrc;
-    std::uint16_t                 writeSync;
-    std::int8_t                   remain;
-    std::uint8_t                  hold;
-    bool                          addTail;
-    bool                          valid;
+    godot::Ref<StreamPeerSerial> serial;
+    std::array<std::uint8_t, 4>  last;
+    std::uint16_t                readCrc;
+    std::uint16_t                readSync;
+    std::uint16_t                writeCrc;
+    std::uint16_t                writeSync;
+    std::int8_t                  remain;
+    std::uint8_t                 hold;
+    bool                         addTail;
+    bool                         valid;
 
     std::uint16_t findSync();
     bool          emitSync(std::uint16_t);

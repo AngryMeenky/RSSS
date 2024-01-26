@@ -30,6 +30,7 @@
 
 #include "register_types.h"
 
+#include "Crc.h"
 #include "PacketPeerRsss.h"
 
 void initialize_rsss_module(ModuleInitializationLevel p_level) {
@@ -37,7 +38,9 @@ void initialize_rsss_module(ModuleInitializationLevel p_level) {
 		return;
 	}
 
+	GDREGISTER_CLASS(RsssCrc);
 	GDREGISTER_CLASS(PacketPeerRsss);
+	GDREGISTER_CLASS(StreamPeerSerial);
 }
 
 void uninitialize_rsss_module(ModuleInitializationLevel p_level) {
