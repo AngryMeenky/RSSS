@@ -65,11 +65,11 @@ int64_t RSSS::read(PackedByteArray &data, int64_t offset, int64_t length) {
   }
 
   if(readSync > 0) {
-    auto bytes = serial->get_partial_data(std::min(length, static_cast<int64_t>(readSync)));
+    auto bytes = serial->get_data(std::min(length, static_cast<int64_t>(readSync)));
 
-    if(auto count = bytes.size(); count > 0) {
-      { PackedByteArray arr(bytes);
-      memcpy(&data[offset], arr.ptr(), count); }
+    if(auto count = bytes.size(); count == 2 && static_cast<int64_t>(bytes[0]) == 0) {
+      { PackedByteArray arr(bytes[1]);
+      memcpy(&data[offset], arr.ptr(), count = arr.size()); }
 
       if(addTail) {
         readCrc = calcCrc16(&data[offset], count, readCrc);
@@ -113,7 +113,7 @@ int64_t RSSS::write(const PackedByteArray &data, int64_t offset, int64_t length)
       arr = serial->put_partial_data(data.slice(offset, offset + length));
     }
 
-    if(auto sent = length - arr.size(); sent > 0) {
+    if(auto sent = static_cast<int64_t>(arr[1]); sent > 0) {
       if(addTail) { writeCrc = calcCrc16(&data[offset], sent, writeCrc); }
 
       writeSync -= sent;
@@ -158,7 +158,7 @@ int64_t RSSS::write(const PackedByteArray &data, int64_t offset, int64_t length)
       arr = serial->put_partial_data(data.slice(offset, offset + count));
     }
 
-    if(auto sent = count - arr.size(); sent > 0) {
+    if(auto sent = static_cast<int64_t>(arr[1]); sent > 0) {
       writeSync -= sent;
       retVal += sent;
 
@@ -218,7 +218,7 @@ bool RSSS::emitSync(std::uint16_t length) {
   header.resize(4);
   header[0] = 0xAA;
   header[1] = length & 0xFF;
-  header[2] = length > 8;
+  header[2] = length >> 8;
   header[3] = 0;
   appendCrc8(&header[0], 3, 0x78);
 
