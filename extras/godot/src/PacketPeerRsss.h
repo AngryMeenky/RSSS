@@ -39,6 +39,7 @@
 #include <cstring>
 #include <condition_variable>
 
+#include <godot_cpp/classes/ref.hpp>
 #include <godot_cpp/variant/builtin_types.hpp>
 #include <godot_cpp/classes/packet_peer_extension.hpp>
 
@@ -81,10 +82,10 @@ class PacketPeerRsss : public PacketPeerExtension {
   std::atomic_bool           go;
 
 public:
-  PacketPeerRsss(StreamPeer * = nullptr);
+  PacketPeerRsss();
   ~PacketPeerRsss();
 
-  static PacketPeerRsss *wrap(StreamPeer *stream) { return new PacketPeerRsss(stream); }
+  static Ref<PacketPeerRsss> wrap(const Ref<StreamPeer> &stream);
 
   int32_t _get_max_packet_size() const override;
   int32_t _get_available_packet_count() const override;
@@ -96,7 +97,10 @@ protected:
   void readPackets();
   void writePackets();
 
+  bool initialize(const Ref<StreamPeer> &stream);
+
   static void _bind_methods();
 };
 
 #endif // PACKET_PEER_RSSS_H
+

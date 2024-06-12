@@ -13,8 +13,9 @@ namespace rsss {
 
 class RSSS {
   public:
-    RSSS(godot::StreamPeer *s, bool t = false);
-    RSSS(): RSSS(nullptr) {}
+    RSSS(bool t = false);
+
+    bool initialize(const godot::Ref<godot::StreamPeer> &stream);
 
     int64_t read(       godot::PackedByteArray &, int64_t, int64_t);
     int64_t write(const godot::PackedByteArray &, int64_t, int64_t);

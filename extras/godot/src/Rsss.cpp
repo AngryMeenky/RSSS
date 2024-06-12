@@ -14,8 +14,8 @@ using namespace rsss;
 using namespace godot;
 
 
-RSSS::RSSS(StreamPeer *s, bool t):
-  serial(s),
+RSSS::RSSS( bool t):
+  serial(),
   last{ 0, 0, 0, 0 },
   readCrc(0),
   readSync(0),
@@ -25,6 +25,12 @@ RSSS::RSSS(StreamPeer *s, bool t):
   hold(0),
   addTail(t),
   valid(!t) {
+}
+
+
+bool RSSS::initialize(const Ref<StreamPeer> &stream) {
+  serial = stream;
+  return serial.is_valid();
 }
 
 

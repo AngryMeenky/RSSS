@@ -37,7 +37,7 @@ void initialize_rsss_module(ModuleInitializationLevel p_level) {
 		return;
 	}
 
-	GDREGISTER_CLASS(PacketPeerRsss);
+	GDREGISTER_VIRTUAL_CLASS(PacketPeerRsss);
 }
 
 void uninitialize_rsss_module(ModuleInitializationLevel p_level) {

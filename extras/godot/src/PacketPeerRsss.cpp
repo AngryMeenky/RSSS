@@ -1,14 +1,10 @@
 #include "PacketPeerRsss.h"
 
 
-PacketPeerRsss::PacketPeerRsss(StreamPeer *s):
-  parser(s),
+PacketPeerRsss::PacketPeerRsss():
+  parser(),
   buffer(new uint8_t[parser.maximumSync()]),
-  go(s != nullptr) {
-  if(go) {
-    worker_in  = std::thread(&PacketPeerRsss::readPackets,  this);
-    worker_out = std::thread(&PacketPeerRsss::writePackets, this);
-  }
+  go(false) {
 }
 
 
@@ -22,6 +18,30 @@ PacketPeerRsss::~PacketPeerRsss() {
   if(worker_out.joinable()) {
     worker_out.join();
   }
+}
+
+
+Ref<PacketPeerRsss> PacketPeerRsss::wrap(const Ref<StreamPeer> &stream) {
+  Ref<PacketPeerRsss> rsss;
+
+  rsss.instantiate();
+  if(rsss.is_valid() && !rsss->initialize(stream)) {
+    rsss.unref();
+  }
+
+  return rsss;
+}
+
+
+bool PacketPeerRsss::initialize(const Ref<StreamPeer> &stream) {
+  if(!go && stream.is_valid() && parser.initialize(stream)) {
+    go = true;
+    worker_in  = std::thread(&PacketPeerRsss::readPackets,  this);
+    worker_out = std::thread(&PacketPeerRsss::writePackets, this);
+    return true;
+  }
+
+  return false;
 }
 
 
