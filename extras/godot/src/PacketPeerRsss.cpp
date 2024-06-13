@@ -135,9 +135,6 @@ void PacketPeerRsss::writePackets() {
 
     int64_t sent = 0;
     do {
-      printf("writing: %ld @ %ld of [", packet.size() - sent, sent);
-      for(auto val : packet) { printf(" %02X", val); }
-      printf(" ]\n");
       if(auto result = parser.write(packet, sent, packet.size() - sent); result < 0) {
         break; // some kind of error
       }
