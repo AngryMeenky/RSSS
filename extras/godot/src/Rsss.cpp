@@ -6,6 +6,8 @@
 #include <cstring>
 #include <unistd.h>
 
+#include <godot_cpp/classes/os.hpp>
+
 #define CRC8_SEED    0x78
 #define CRC16_SEED 0x8795
 
@@ -186,18 +188,9 @@ failure:
 }
 
 
-static bool nextByte(StreamPeer *s, uint8_t *d) {
-  if(s->get_available_bytes() > 0) {
-    *d = s->get_u8();
-    return true;
-  }
-
-  return false;
-}
-
-
 std::uint16_t RSSS::findSync() {
-  do {
+  for(auto avail = serial->get_available_bytes(); avail > 0; --avail) {
+    last[3] = serial->get_u8();
     if(last[0] == 0xAA && validateCrc8(&last[0], 4, CRC8_SEED)) {
       auto retVal = last[1] | (last[2] << 8);
       memset(&last[0], 0, 4);
@@ -207,7 +200,7 @@ std::uint16_t RSSS::findSync() {
     }
 
     memmove(&last[0], &last[1], 3);
-  } while(nextByte(serial.ptr(), &last[3]));
+  }
 
   return 0;
 }
@@ -230,15 +223,11 @@ bool RSSS::emitSync(std::uint16_t length) {
   return false;
 }
 
-bool RSSS::waitForSync(int64_t ms) {
-  if(readSync > 0) {
-    return true;
-  }
 
-  auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
-  do {
+bool RSSS::waitForSync(int64_t ms) {
+  for(auto os = OS::get_singleton(); readSync == 0 && ms > 0; os->delay_msec(10), ms -= 10) {
     readSync = findSync();
-  } while(readSync == 0 && std::chrono::steady_clock::now() < end);
+  }
 
   return readSync != 0;
 }
