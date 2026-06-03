@@ -29,6 +29,7 @@ class RSSS {
 
     int16_t _findSync();
     void _emitSync(int16_t);
+    int _emitTail();
 };
 
 

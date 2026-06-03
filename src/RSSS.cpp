@@ -142,10 +142,7 @@ int RSSS::write(uint8_t *data, int length) {
         goto complete; // still in the synchronized region
       }
       else if(_addTail) {
-        // the syncronized chunk was completed
-        uint8_t buffer[2] = { static_cast<uint8_t>( _writeCrc       & 0xFF),
-                              static_cast<uint8_t>((_writeCrc >> 8) & 0xFF) };
-        _serial->write(&buffer[0], 2); // write the tail bytes
+        _emitTail();
       }
     }
     else if(sent == 0) {
@@ -169,11 +166,9 @@ int RSSS::write(uint8_t *data, int length) {
       if(_addTail) {
         // update the written CRC if required
         _writeCrc = rsss::calcCrc16(data, sent, _writeCrc);
+        // write the tail if the synchronized region is complete
         if(!_writeSync) {
-          // the syncronized chunk was completed
-          uint8_t buffer[2] = { static_cast<uint8_t>( _writeCrc       & 0xFF),
-                                static_cast<uint8_t>((_writeCrc >> 8) & 0xFF) };
-          _serial->write(&buffer[0], 2); // write the tail bytes
+          _emitTail();
         }
       }
     }
@@ -217,5 +212,24 @@ void RSSS::_emitSync(int16_t len) {
   rsss::appendCrc8(&packet[0], 3, CRC8_SEED);
   _serial->write(&packet[0], sizeof(packet));
   _writeCrc = CRC16_SEED;
+}
+
+
+// TODO: make this non-blocking
+int RSSS::_emitTail() {
+  int sent = 0, res;
+  uint8_t buffer[2] = { static_cast<uint8_t>( _writeCrc       & 0xFF),
+                        static_cast<uint8_t>((_writeCrc >> 8) & 0xFF) };
+  do {
+    res = _serial->write(&buffer[sent], 2 - sent); // write the tail bytes
+    if(res > 0) {
+      sent += res;
+    }
+    else if(res < 0) {
+      return -1;
+    }
+  } while(sent < 2);
+
+  return 0;
 }
 
